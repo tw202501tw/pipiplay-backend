@@ -1,7 +1,7 @@
 /**
  * Pipiplay 桌遊核心引擎 - game_manager.js
  * 負責處理即時桌遊房間的遊戲狀態、回合邏輯、規則判定，並透過 Socket.io 進行全體同步。
- * * 支援遊戲：
+ * 支援遊戲：
  * 1. 五子棋 (Gomoku)
  * 2. 誰是臥底 (Who is the Spy)
  */
