@@ -247,8 +247,26 @@ function generateCheckMacValue(params) {
 // 4. API ENDPOINTS (REST 接口實作)
 // ==========================================
 
+// --- 主動連線與環境變數診斷 API ---
 app.get('/', (req, res) => {
-  res.send('Pipiplay backend is running 🚀');
+  let maskedURI = "未設定";
+  let hasBracketError = false;
+
+  if (MONGODB_URI) {
+    hasBracketError = MONGODB_URI.includes('<') || MONGODB_URI.includes('>') || MONGODB_URI.includes('db_password');
+    // 將密碼部分遮罩，避免外流
+    maskedURI = MONGODB_URI.replace(/:([^:@]+)@/, ':******@');
+  }
+
+  res.json({
+    status: "Pipiplay 2.0 診斷儀表板啟動中 🚀",
+    databaseConnectionState: mongoose.connection.readyState === 1 ? "🟢 已成功連接 MongoDB Atlas！" : "🔴 連線失敗或尚未建立連線",
+    mongooseStateCode: mongoose.connection.readyState,
+    mongodbUriValue: maskedURI,
+    diagnosticResult: hasBracketError 
+      ? "🚨 發現嚴重設定錯誤：您的 MONGODB_URI 變數中，似乎還留有 '<db_password>' 或 '<' 號與 '>' 號！請務必去 Render 設定將其刪除，並換成您真正的資料庫使用者密碼！" 
+      : "ℹ️ 字元偵測未發現角括號，若依舊無法連線，代表密碼字元本身輸入錯誤、或有特殊符號未 URL-encode。"
+  });
 });
 
 // --- 註冊 (初始 100 金幣) ---
@@ -955,7 +973,7 @@ app.get('/api/gifts/init', async (req, res) => {
         error: '資料庫尚未連線成功 🔌',
         readyState: mongoose.connection.readyState,
         details: 'Mongoose connection is not ready. Current state: ' + mongoose.connection.readyState,
-        suggestion: '這代表您的 Render 伺服器已正常執行，但「尚未成功連上」您的 MongoDB Atlas 資料庫。請立即至 MongoDB Atlas (IP Access List) 確認是否開放 0.0.0.0/0 連線，並確認 Render 的 MONGODB_URI 環境變數中的資料庫密碼正確無誤！'
+        suggestion: '這代表您的 Render 伺服器已正常執行，但「尚未成功連上」您的 MongoDB Atlas 資料庫。請立即確認 Render 的 MONGODB_URI 環境變數中的資料庫密碼正確無誤！'
       });
     }
 
