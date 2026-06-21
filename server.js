@@ -245,7 +245,7 @@ function generateCheckMacValue(params) {
 // ==========================================
 
 app.get('/', (req, res) => {
-  res.send('Pipiplay 2.0 伺服器正在運行中 🚀');
+  res.send('Pipiplay backend is running 🚀');
 });
 
 // --- 註冊 (初始 100 金幣) ---
@@ -943,7 +943,8 @@ app.post('/api/admin/grant-vip', authenticateJWT, requireAdmin, async (req, res)
 // 禮物系統 API
 // ==========================================
 
-app.post('/api/gifts/init', async (req, res) => {
+// 這裡我們修改為 GET，讓你用瀏覽器就能一鍵初始化
+app.get('/api/gifts/init', async (req, res) => {
   try {
     const count = await Gift.countDocuments();
     if (count === 0) {
