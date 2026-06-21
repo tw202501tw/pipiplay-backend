@@ -943,7 +943,7 @@ app.post('/api/admin/grant-vip', authenticateJWT, requireAdmin, async (req, res)
 // 禮物系統 API
 // ==========================================
 
-// 這裡我們修改為 GET，讓你用瀏覽器就能一鍵初始化
+// 這裡我們修改為 GET，讓你用瀏覽器就能一鍵初始化，並新增 error details 以便精準除錯
 app.get('/api/gifts/init', async (req, res) => {
   try {
     const count = await Gift.countDocuments();
@@ -958,7 +958,12 @@ app.get('/api/gifts/init', async (req, res) => {
     }
     res.json({ message: '商城已有禮物，無須重複初始化' });
   } catch (error) {
-    res.status(500).json({ error: '商城初始化失敗' });
+    console.error('❌ 商城初始化失敗:', error);
+    res.status(500).json({ 
+      error: '商城初始化失敗', 
+      details: error.message,
+      suggestion: '請確認 MONGODB_URI 連線密碼正確，且 MongoDB Atlas 的 Network Access IP 白名單已設定為 0.0.0.0/0。'
+    });
   }
 });
 
