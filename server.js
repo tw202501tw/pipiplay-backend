@@ -31,6 +31,9 @@ const PORT = process.env.PORT || 4000;
 const MONGODB_URI = process.env.MONGODB_URI;
 const JWT_SECRET = process.env.JWT_SECRET || 'PIPIPLAY_SUPER_SECRET_KEY_V2';
 
+// 關閉 Mongoose 的指令快取緩衝機制，防止連線失敗時 API 乾等 10 秒超時，改為立刻報錯
+mongoose.set('bufferCommands', false);
+
 // 綠界金鑰 (由環境變數讀取，若無則預設載入綠界官方提供的「測試環境金鑰」)
 const ECPAY_HASH_KEY = process.env.ECPAY_HASH_KEY || '5294y06JbISpM5x9'; 
 const ECPAY_HASH_IV = process.env.ECPAY_HASH_IV || 'v77hoKGq4kWxGbIS';
