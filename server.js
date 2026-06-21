@@ -1203,12 +1203,15 @@ if (!MONGODB_URI) {
   process.exit(1);
 }
 
+// 先啟動伺服器監聽，確保 Render 能夠即時偵測到 Port 並通過 Health Check 部署成功
+server.listen(PORT, () => {
+  console.log(`🚀 Pipiplay 2.0 伺服器已於埠號: ${PORT} 順利啟動`);
+});
+
+// 非同步連接 MongoDB，避免資料庫連線延遲導致 Render 部署超時 (Timeout)
 mongoose.connect(MONGODB_URI)
   .then(() => {
     console.log('✅ Pipiplay 已成功連接 MongoDB Atlas！');
-    server.listen(PORT, () => {
-      console.log(`🚀 Pipiplay 2.0 伺服器已於埠號: ${PORT} 順利啟動`);
-    });
   })
   .catch((err) => {
     console.error('❌ MongoDB 連接失敗:', err);
