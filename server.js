@@ -244,6 +244,10 @@ function generateCheckMacValue(params) {
 // 4. API ENDPOINTS (REST 接口實作)
 // ==========================================
 
+app.get('/', (req, res) => {
+  res.send('Pipiplay 2.0 伺服器正在運行中 🚀');
+});
+
 // --- 註冊 (初始 100 金幣) ---
 app.post('/api/auth/register', async (req, res) => {
   try {
