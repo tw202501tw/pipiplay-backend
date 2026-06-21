@@ -943,9 +943,19 @@ app.post('/api/admin/grant-vip', authenticateJWT, requireAdmin, async (req, res)
 // 禮物系統 API
 // ==========================================
 
-// 這裡我們修改為 GET，讓你用瀏覽器就能一鍵初始化，並新增 error details 以便精準除錯
+// 這裡我們修改為 GET，讓你用瀏覽器就能一鍵初始化，並新增 readyState 檢查以防資料庫尚未建立連線
 app.get('/api/gifts/init', async (req, res) => {
   try {
+    // 檢查資料庫連接狀態 (0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting)
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(500).json({
+        error: '資料庫尚未連線成功 🔌',
+        readyState: mongoose.connection.readyState,
+        details: 'Mongoose connection is not ready. Current state: ' + mongoose.connection.readyState,
+        suggestion: '這代表您的 Render 伺服器已正常執行，但「尚未成功連上」您的 MongoDB Atlas 資料庫。請立即至 MongoDB Atlas (IP Access List) 確認是否開放 0.0.0.0/0 連線，並確認 Render 的 MONGODB_URI 環境變數中的資料庫密碼正確無誤！'
+      });
+    }
+
     const count = await Gift.countDocuments();
     if (count === 0) {
       await Gift.insertMany([
